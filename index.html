@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TheAnion — Lineage 2 Gracia Final x1</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ── TOKENS ── */
+    :root {
+      --void:      #0A0C14;
+      --deep:      #111526;
+      --steel:     #1E2540;
+      --gold:      #C9A84C;
+      --gold-dim:  #8A6E2A;
+      --gold-glow: #F0D07A;
+      --crimson:   #8B1A1A;
+      --crimson-l: #C0352E;
+      --parchment: #E8DFC0;
+      --muted:     #9AA0B8;
+      --card-bg:   rgba(20,24,48,0.85);
+      --border:    rgba(201,168,76,0.25);
+      --radius:    6px;
+      --font-d:    'Cinzel', serif;
+      --font-b:    'Crimson Text', Georgia, serif;
+      --font-m:    'JetBrains Mono', monospace;
+    }
+
+    /* ── RESET ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--void);
+      color: var(--parchment);
+      font-family: var(--font-b);
+      font-size: 18px;
+      line-height: 1.65;
+      overflow-x: hidden;
+    }
+
+    img { display: block; max-width: 100%; }
+    a { color: var(--gold); text-decoration: none; transition: color .2s; }
+    a:hover { color: var(--gold-glow); }
+
+    /* ── SCROLLBAR ── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--void); }
+    ::-webkit-scrollbar-thumb { background: var(--gold-dim); border-radius: 3px; }
+
+    /* ── NAVBAR ── */
+    #navbar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 2.5rem;
+      height: 64px;
+      background: rgba(10,12,20,0.82);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+      transition: background .3s;
+    }
+    .nav-logo {
+      font-family: var(--font-d);
+      font-size: 1.35rem;
+      font-weight: 700;
+      letter-spacing: .12em;
+      color: var(--gold);
+      text-shadow: 0 0 18px rgba(201,168,76,.45);
+    }
+    .nav-logo span { color: var(--parchment); }
+    .nav-links {
+      display: flex; gap: 2rem; list-style: none;
+      font-family: var(--font-d); font-size: .78rem; letter-spacing: .1em;
+    }
+    .nav-links a { color: var(--muted); }
+    .nav-links a:hover { color: var(--gold); }
+
+    /* Language switcher */
+    #lang-switcher {
+      display: flex; gap: .4rem; align-items: center;
+    }
+    .lang-btn {
+      background: none; border: 1px solid var(--border);
+      color: var(--muted); font-family: var(--font-d);
+      font-size: .65rem; letter-spacing: .1em;
+      padding: .25rem .55rem; border-radius: 3px;
+      cursor: pointer; transition: all .2s;
+    }
+    .lang-btn:hover, .lang-btn.active {
+      color: var(--gold); border-color: var(--gold);
+      background: rgba(201,168,76,.08);
+    }
+
+    /* ── HERO ── */
+    #hero {
+      position: relative; min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      text-align: center; overflow: hidden;
+    }
+    .hero-bg {
+      position: absolute; inset: 0;
+      background-image: url('https://ru.dalam.world/dwback.jpeg');
+      background-size: cover; background-position: center top;
+      filter: brightness(.45) saturate(.8);
+      z-index: 0;
+    }
+    .hero-bg::after {
+      content: '';
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 50% 40%, transparent 30%, var(--void) 100%),
+        linear-gradient(to bottom, transparent 60%, var(--void) 100%);
+    }
+
+    /* Ember particles */
+    .embers { position: absolute; inset: 0; pointer-events: none; z-index: 1; overflow: hidden; }
+    .ember {
+      position: absolute; bottom: -10px;
+      width: 3px; height: 3px; border-radius: 50%;
+      background: var(--gold);
+      animation: rise linear infinite;
+      opacity: 0;
+    }
+    @keyframes rise {
+      0%   { transform: translateX(0) translateY(0) scale(1); opacity: .8; }
+      60%  { opacity: .5; }
+      100% { transform: translateX(var(--dx, 30px)) translateY(-85vh) scale(.3); opacity: 0; }
+    }
+
+    .hero-content {
+      position: relative; z-index: 2;
+      max-width: 860px; padding: 0 1.5rem;
+    }
+    .hero-eyebrow {
+      font-family: var(--font-m); font-size: .72rem;
+      letter-spacing: .3em; text-transform: uppercase;
+      color: var(--gold-dim); margin-bottom: 1rem;
+    }
+    .hero-title {
+      font-family: var(--font-d); font-size: clamp(2.8rem, 7vw, 5.5rem);
+      font-weight: 900; line-height: 1.05;
+      color: var(--gold);
+      text-shadow: 0 0 60px rgba(201,168,76,.35), 0 2px 4px rgba(0,0,0,.8);
+      letter-spacing: .06em;
+      margin-bottom: .5rem;
+    }
+    .hero-sub {
+      font-family: var(--font-d); font-size: clamp(1rem, 2.5vw, 1.3rem);
+      color: var(--parchment); letter-spacing: .15em; margin-bottom: 1.8rem;
+      opacity: .85;
+    }
+    .hero-desc {
+      font-size: 1.1rem; color: var(--muted);
+      max-width: 600px; margin: 0 auto 2.5rem;
+      line-height: 1.7;
+    }
+
+    /* Rune divider */
+    .rune-divider {
+      display: flex; align-items: center; gap: 1rem;
+      justify-content: center; margin: 1.5rem 0;
+    }
+    .rune-divider::before, .rune-divider::after {
+      content: ''; flex: 1; max-width: 120px;
+      height: 1px; background: linear-gradient(to right, transparent, var(--gold-dim));
+    }
+    .rune-divider::after { background: linear-gradient(to left, transparent, var(--gold-dim)); }
+    .rune-glyph { color: var(--gold); font-size: 1.2rem; opacity: .7; }
+
+    /* Rates badge row */
+    .rates-row {
+      display: flex; justify-content: center; flex-wrap: wrap; gap: .8rem;
+      margin-bottom: 2.5rem;
+    }
+    .rate-badge {
+      background: rgba(139,26,26,.18);
+      border: 1px solid rgba(139,26,26,.45);
+      border-radius: var(--radius);
+      padding: .4rem 1rem;
+      font-family: var(--font-m); font-size: .8rem;
+      color: var(--parchment);
+    }
+    .rate-badge strong { color: var(--gold); }
+
+    /* CTA buttons */
+    .cta-row { display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center; }
+    .btn {
+      display: inline-flex; align-items: center; gap: .5rem;
+      font-family: var(--font-d); font-size: .78rem;
+      letter-spacing: .12em; text-transform: uppercase;
+      padding: .75rem 1.8rem; border-radius: var(--radius);
+      border: 1px solid transparent;
+      cursor: pointer; transition: all .25s;
+      text-decoration: none;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--crimson), #5C0E0E);
+      border-color: var(--crimson-l); color: var(--parchment);
+      box-shadow: 0 0 20px rgba(139,26,26,.4);
+    }
+    .btn-primary:hover {
+      background: linear-gradient(135deg, var(--crimson-l), var(--crimson));
+      box-shadow: 0 0 35px rgba(192,53,46,.5);
+      color: #fff; transform: translateY(-1px);
+    }
+    .btn-outline {
+      border-color: var(--border); color: var(--gold);
+      background: rgba(201,168,76,.05);
+    }
+    .btn-outline:hover {
+      background: rgba(201,168,76,.12); border-color: var(--gold);
+      color: var(--gold-glow); transform: translateY(-1px);
+    }
+    .btn-discord {
+      background: rgba(88,101,242,.15);
+      border-color: rgba(88,101,242,.45); color: #B0B8FF;
+    }
+    .btn-discord:hover { background: rgba(88,101,242,.28); color: #fff; }
+    .btn-tg {
+      background: rgba(0,136,204,.12);
+      border-color: rgba(0,136,204,.4); color: #7EC8E3;
+    }
+    .btn-tg:hover { background: rgba(0,136,204,.25); color: #fff; }
+
+    /* ── SECTIONS ── */
+    section { padding: 6rem 1.5rem; }
+    .container { max-width: 1100px; margin: 0 auto; }
+    .section-label {
+      font-family: var(--font-m); font-size: .68rem;
+      letter-spacing: .35em; text-transform: uppercase;
+      color: var(--gold-dim); margin-bottom: .75rem;
+    }
+    .section-title {
+      font-family: var(--font-d); font-size: clamp(1.6rem, 3.5vw, 2.4rem);
+      font-weight: 700; color: var(--gold);
+      line-height: 1.15; margin-bottom: 1.2rem;
+    }
+    .section-body { color: var(--muted); max-width: 640px; font-size: 1.05rem; }
+
+    /* ── ABOUT ── */
+    #about { background: var(--deep); }
+    .about-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 4rem; align-items: center;
+    }
+    .about-features { display: flex; flex-direction: column; gap: 1.5rem; margin-top: 2rem; }
+    .feature-item { display: flex; gap: 1rem; align-items: flex-start; }
+    .feature-icon {
+      width: 38px; height: 38px; flex-shrink: 0;
+      background: rgba(201,168,76,.1); border: 1px solid var(--border);
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; color: var(--gold);
+    }
+    .feature-text h4 { font-family: var(--font-d); font-size: .85rem; color: var(--parchment); margin-bottom: .2rem; letter-spacing: .05em; }
+    .feature-text p { font-size: .95rem; color: var(--muted); line-height: 1.5; }
+
+    .about-stat-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem;
+    }
+    .stat-card {
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 1.4rem 1.2rem;
+      text-align: center;
+    }
+    .stat-num {
+      font-family: var(--font-d); font-size: 2rem; font-weight: 900;
+      color: var(--gold); display: block;
+    }
+    .stat-lbl { font-family: var(--font-m); font-size: .68rem; letter-spacing: .2em; color: var(--muted); text-transform: uppercase; }
+
+    /* ── RATES ── */
+    #rates { background: var(--void); }
+    .rates-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.2rem; margin-top: 2.5rem;
+    }
+    .rate-card {
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 1.5rem 1.2rem;
+      position: relative; overflow: hidden;
+      transition: border-color .25s, transform .25s;
+    }
+    .rate-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0;
+      height: 2px; background: linear-gradient(to right, transparent, var(--gold), transparent);
+      opacity: 0; transition: opacity .25s;
+    }
+    .rate-card:hover { border-color: var(--gold-dim); transform: translateY(-3px); }
+    .rate-card:hover::before { opacity: 1; }
+    .rate-name { font-family: var(--font-d); font-size: .78rem; letter-spacing: .12em; color: var(--muted); text-transform: uppercase; margin-bottom: .5rem; }
+    .rate-val { font-family: var(--font-d); font-size: 2.2rem; font-weight: 900; color: var(--gold); line-height: 1; }
+    .rate-note { font-size: .88rem; color: var(--muted); margin-top: .4rem; }
+
+    /* ── DOWNLOAD ── */
+    #download { background: var(--deep); }
+    .dl-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem; margin-top: 2.5rem;
+    }
+    .dl-card {
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 2rem 1.5rem;
+      display: flex; flex-direction: column; gap: 1rem;
+      transition: border-color .25s;
+    }
+    .dl-card:hover { border-color: var(--gold-dim); }
+    .dl-icon { font-size: 2rem; }
+    .dl-card h3 { font-family: var(--font-d); font-size: .9rem; letter-spacing: .1em; color: var(--parchment); }
+    .dl-card p { font-size: .9rem; color: var(--muted); flex: 1; }
+
+    /* ── COMMUNITY ── */
+    #community { background: var(--void); }
+    .comm-row {
+      display: flex; flex-wrap: wrap; gap: 1.5rem;
+      margin-top: 2.5rem;
+    }
+    .comm-card {
+      flex: 1; min-width: 260px;
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 2rem 1.5rem;
+      display: flex; flex-direction: column; gap: 1rem;
+    }
+    .comm-card h3 { font-family: var(--font-d); font-size: .9rem; letter-spacing: .1em; color: var(--parchment); }
+    .comm-card p { font-size: .95rem; color: var(--muted); flex: 1; }
+
+    /* ── WIDGET ZONE ── */
+    #widgets { background: var(--deep); }
+    .widget-zone {
+      margin-top: 2.5rem;
+      border: 1px dashed rgba(201,168,76,.25);
+      border-radius: var(--radius);
+      padding: 3rem 2rem;
+      text-align: center;
+      color: var(--muted);
+      font-family: var(--font-m);
+      font-size: .78rem;
+      letter-spacing: .1em;
+      background: rgba(201,168,76,.03);
+      min-height: 300px;
+      display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 1rem;
+    }
+    .widget-zone-label {
+      color: var(--gold-dim); font-size: .9rem; letter-spacing: .2em; text-transform: uppercase;
+    }
+    .widget-zone p { font-size: .85rem; opacity: .6; max-width: 380px; }
+
+    /* ── REGISTER ── */
+    #register { background: var(--void); }
+    .reg-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;
+      margin-top: 2.5rem;
+    }
+    .reg-card {
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 2rem 1.5rem;
+      display: flex; flex-direction: column; gap: 1.2rem;
+      align-items: flex-start;
+    }
+    .reg-card h3 { font-family: var(--font-d); font-size: .9rem; letter-spacing: .1em; color: var(--parchment); }
+    .reg-card p { font-size: .95rem; color: var(--muted); }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--deep); border-top: 1px solid var(--border);
+      padding: 3rem 1.5rem; text-align: center;
+    }
+    .footer-logo { font-family: var(--font-d); font-size: 1.2rem; color: var(--gold); letter-spacing: .15em; margin-bottom: .5rem; }
+    .footer-sub { font-family: var(--font-m); font-size: .7rem; color: var(--muted); letter-spacing: .2em; text-transform: uppercase; margin-bottom: 1.5rem; }
+    .footer-links { display: flex; justify-content: center; flex-wrap: wrap; gap: 1.5rem; margin-bottom: 1.5rem; }
+    .footer-links a { font-family: var(--font-d); font-size: .72rem; letter-spacing: .1em; color: var(--muted); }
+    .footer-links a:hover { color: var(--gold); }
+    .footer-copy { font-size: .82rem; color: rgba(154,160,184,.4); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      #navbar { padding: 0 1.2rem; }
+      .nav-links { display: none; }
+      .about-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+      .reg-grid { grid-template-columns: 1fr; }
+      .about-stat-grid { grid-template-columns: 1fr 1fr; }
+    }
+
+    /* ── HIDDEN by lang ── */
+    [data-lang] { display: none; }
+    [data-lang].active { display: block; }
+    [data-lang-inline] { display: none; }
+    [data-lang-inline].active { display: inline; }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav id="navbar">
+    <div class="nav-logo">The<span>Anion</span></div>
+    <ul class="nav-links">
+      <li><a href="#about"   data-navkey="nav_about">About</a></li>
+      <li><a href="#rates"   data-navkey="nav_rates">Rates</a></li>
+      <li><a href="#download" data-navkey="nav_dl">Download</a></li>
+      <li><a href="#community" data-navkey="nav_comm">Community</a></li>
+      <li><a href="#register" data-navkey="nav_reg">Register</a></li>
+    </ul>
+    <div id="lang-switcher">
+      <button class="lang-btn active" onclick="setLang('en')">EN</button>
+      <button class="lang-btn" onclick="setLang('ru')">RU</button>
+      <button class="lang-btn" onclick="setLang('pt')">PT</button>
+      <button class="lang-btn" onclick="setLang('el')">GR</button>
+      <button class="lang-btn" onclick="setLang('uk')">UA</button>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section id="hero">
+    <div class="hero-bg"></div>
+    <div class="embers" id="embers"></div>
+    <div class="hero-content">
+      <p class="hero-eyebrow" data-key="hero_eyebrow">Lineage 2 · Gracia Final · x1</p>
+      <h1 class="hero-title">TheAnion</h1>
+      <p class="hero-sub" data-key="hero_sub">theanion.ru</p>
+      <div class="rune-divider"><span class="rune-glyph">✦</span></div>
+      <p class="hero-desc" data-key="hero_desc">
+        Experience Lineage 2 the way it was meant to be — at x1 rates, on a server that respects the original vision of Gracia Final.
+      </p>
+      <div class="rates-row">
+        <span class="rate-badge"><strong>XP</strong> × 1</span>
+        <span class="rate-badge"><strong>SP</strong> × 1</span>
+        <span class="rate-badge"><strong data-key="drop">Drop</strong> × 1</span>
+        <span class="rate-badge"><strong data-key="spoil">Spoil</strong> × 1</span>
+        <span class="rate-badge"><strong data-key="adena">Adena</strong> × 1</span>
+      </div>
+      <div class="cta-row">
+        <a href="https://cp.dalam.world/register/" class="btn btn-primary" target="_blank" data-key="cta_register">⚔ Register Now</a>
+        <a href="#download" class="btn btn-outline" data-key="cta_dl">⬇ Download Client</a>
+        <a href="https://discord.com/invite/T6NNZJRs4G" class="btn btn-discord" target="_blank">Discord</a>
+        <a href="https://t.me/dalamworld" class="btn btn-tg" target="_blank">Telegram</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about">
+    <div class="container">
+      <div class="about-grid">
+        <div>
+          <p class="section-label" data-key="about_label">About the Server</p>
+          <h2 class="section-title" data-key="about_title">A World Unchanged by Time</h2>
+          <p class="section-body" data-key="about_body">
+            TheAnion is a private Lineage 2 server running on the legendary Gracia Final chronicle. Every system, mechanic, and formula operates exactly as in the original retail version — no shortcuts, no pay-to-win, no artificial inflation. Pure classic gameplay with a modern, optimised client.
+          </p>
+          <div class="about-features" id="features-list">
+            <!-- filled by JS -->
+          </div>
+        </div>
+        <div class="about-stat-grid">
+          <div class="stat-card">
+            <span class="stat-num">x1</span>
+            <span class="stat-lbl" data-key="stat_all">All Rates</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-num">GF</span>
+            <span class="stat-lbl" data-key="stat_chr">Chronicle</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-num">24/7</span>
+            <span class="stat-lbl" data-key="stat_up">Uptime</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-num">0</span>
+            <span class="stat-lbl" data-key="stat_p2w">Pay-to-Win</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RATES -->
+  <section id="rates">
+    <div class="container">
+      <p class="section-label" data-key="rates_label">Server Rates</p>
+      <h2 class="section-title" data-key="rates_title">The Original Numbers</h2>
+      <p class="section-body" data-key="rates_body">All rates are set to ×1 — exactly as they were on official Lineage 2 servers. No boosts, no multipliers, no cheating the grind.</p>
+      <div class="rates-grid" id="rates-grid">
+        <!-- filled by JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- DOWNLOAD -->
+  <section id="download">
+    <div class="container">
+      <p class="section-label" data-key="dl_label">Download</p>
+      <h2 class="section-title" data-key="dl_title">Get into the World</h2>
+      <p class="section-body" data-key="dl_body">Choose the option that works best for your connection. The optimised client delivers improved performance over the original while keeping the authentic Gracia Final experience.</p>
+      <div class="dl-grid" id="dl-grid">
+        <!-- filled by JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- COMMUNITY -->
+  <section id="community">
+    <div class="container">
+      <p class="section-label" data-key="comm_label">Community</p>
+      <h2 class="section-title" data-key="comm_title">Join the Brotherhood</h2>
+      <p class="section-body" data-key="comm_body">Connect with thousands of players, get server news, find a clan, and talk to the staff directly in our Discord and Telegram.</p>
+      <div class="comm-row">
+        <div class="comm-card">
+          <div class="dl-icon">💬</div>
+          <h3>Discord</h3>
+          <p data-key="comm_discord">Our main hub for announcements, support, and community chat. Events, GM posts, and patch notes all land here first.</p>
+          <a href="https://discord.com/invite/T6NNZJRs4G" class="btn btn-discord" target="_blank" data-key="comm_btn_dc">Join Discord</a>
+        </div>
+        <div class="comm-card">
+          <div class="dl-icon">✈️</div>
+          <h3>Telegram</h3>
+          <p data-key="comm_tg">Follow the Telegram channel for quick news, maintenance notices, and server updates on the go.</p>
+          <a href="https://t.me/dalamworld" class="btn btn-tg" target="_blank" data-key="comm_btn_tg">Open Telegram</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WIDGET ZONE -->
+  <section id="widgets">
+    <div class="container">
+      <script src="https://rep.dalam.world/api.js" data-type="forts" data-width="600px"></script>
+      </div>
+    </div>
+  </section>
+
+  <!-- REGISTER -->
+  <section id="register">
+    <div class="container">
+      <p class="section-label" data-key="reg_label">Register</p>
+      <h2 class="section-title" data-key="reg_title">Your Journey Begins</h2>
+      <p class="section-body" data-key="reg_body">Create your account in seconds and step through the gates of Aden.</p>
+      <div class="reg-grid">
+        <div class="reg-card">
+          <div class="dl-icon">🌐</div>
+          <h3 data-key="reg_web_h">Web Registration</h3>
+          <p data-key="reg_web_p">Create your account on the control panel, manage characters, change passwords, and access server tools.</p>
+          <a href="https://cp.dalam.world/register/" class="btn btn-primary" target="_blank" data-key="reg_web_btn">Register on Site</a>
+        </div>
+        <div class="reg-card">
+          <div class="dl-icon">🤖</div>
+          <h3 data-key="reg_bot_h">Register via Telegram Bot</h3>
+          <p data-key="reg_bot_p">Quick registration directly through Telegram — no browser needed. Just open the bot and follow the steps.</p>
+          <a href="https://t.me/DWRegbot" class="btn btn-tg" target="_blank" data-key="reg_bot_btn">Open Bot</a>
+        </div>
+        <div class="reg-card">
+          <div class="dl-icon">🔑</div>
+          <h3 data-key="reg_cp_h">Personal Cabinet</h3>
+          <p data-key="reg_cp_p">Already registered? Log in to your account panel to manage your characters and server settings.</p>
+          <a href="https://cp.dalam.world/login/" class="btn btn-outline" target="_blank" data-key="reg_cp_btn">Log In</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-logo">TheAnion</div>
+    <div class="footer-sub">Lineage 2 · Gracia Final · x1</div>
+    <div class="footer-links">
+      <a href="https://theanion.ru" target="_blank">theanion.ru</a>
+      <a href="https://cp.dalam.world/register/" target="_blank" data-key="nav_reg">Register</a>
+      <a href="https://cp.dalam.world/login/" target="_blank" data-key="footer_login">Login</a>
+      <a href="https://discord.com/invite/T6NNZJRs4G" target="_blank">Discord</a>
+      <a href="https://t.me/dalamworld" target="_blank">Telegram</a>
+    </div>
+    <div class="footer-copy" data-key="footer_copy" style="visibility:hidden">© 2025 TheAnion. All rights reserved. Lineage 2 is a trademark.</div>
+  </footer>
+
+  <script>
+  // ── TRANSLATIONS ──────────────────────────────────────────────────────────
+  const T = {
+    en: {
+      hero_eyebrow: 'Lineage 2 · Gracia Final · x1',
+      hero_sub: 'theanion.ru',
+      hero_desc: 'Experience Lineage 2 the way it was meant to be — at x1 rates, on a server that respects the original vision of Gracia Final.',
+      drop: 'Drop', spoil: 'Spoil', adena: 'Adena',
+      cta_register: '⚔ Register Now', cta_dl: '⬇ Download Client',
+      nav_about: 'About', nav_rates: 'Rates', nav_dl: 'Download', nav_comm: 'Community', nav_reg: 'Register',
+      about_label: 'About the Server', about_title: 'A World Unchanged by Time',
+      about_body: 'TheAnion is a private Lineage 2 server running on the legendary Gracia Final chronicle. Every system, mechanic, and formula operates exactly as in the original retail version — no shortcuts, no pay-to-win, no artificial inflation. Pure classic gameplay with a modern, optimised client.',
+      stat_all: 'All Rates', stat_chr: 'Chronicle', stat_up: 'Uptime', stat_p2w: 'Pay-to-Win',
+      rates_label: 'Server Rates', rates_title: 'The Original Numbers',
+      rates_body: 'All rates are set to ×1 — exactly as they were on official Lineage 2 servers. No boosts, no multipliers, no cheating the grind.',
+      dl_label: 'Download', dl_title: 'Get into the World',
+      dl_body: 'Choose the option that works best for your connection. The optimised client delivers improved performance over the original while keeping the authentic Gracia Final experience.',
+      comm_label: 'Community', comm_title: 'Join the Brotherhood',
+      comm_body: 'Connect with thousands of players, get server news, find a clan, and talk to the staff directly in our Discord and Telegram.',
+      comm_discord: 'Our main hub for announcements, support, and community chat. Events, GM posts, and patch notes all land here first.',
+      comm_tg: 'Follow the Telegram channel for quick news, maintenance notices, and server updates on the go.',
+      comm_btn_dc: 'Join Discord', comm_btn_tg: 'Open Telegram',
+      wgt_label: 'Live Stats', wgt_title: 'Server Online',
+      wgt_zone_lbl: 'Widget Zone',
+      wgt_zone_p: 'Place your online counter, top-player widget, boss timer, or any embed here. This block is ready for your code.',
+      reg_label: 'Register', reg_title: 'Your Journey Begins',
+      reg_body: 'Create your account in seconds and step through the gates of Aden.',
+      reg_web_h: 'Web Registration', reg_web_p: 'Create your account on the control panel, manage characters, change passwords, and access server tools.', reg_web_btn: 'Register on Site',
+      reg_bot_h: 'Register via Telegram Bot', reg_bot_p: 'Quick registration directly through Telegram — no browser needed. Just open the bot and follow the steps.', reg_bot_btn: 'Open Bot',
+      reg_cp_h: 'Personal Cabinet', reg_cp_p: 'Already registered? Log in to your account panel to manage your characters and server settings.', reg_cp_btn: 'Log In',
+      footer_login: 'Login', footer_copy: '© 2025 TheAnion. All rights reserved. Lineage 2 is a trademark of NCSoft.',
+      features: [
+        { icon: '⚙️', title: 'Authentic Mechanics', desc: 'All game systems — sieges, olympiad, subclasses, augmentation — work as they did on retail Gracia Final.' },
+        { icon: '🖥️', title: 'Optimised Client', desc: 'Our custom client is based on the original but rebuilt for modern hardware: better FPS, reduced crashes, faster loading.' },
+        { icon: '🛡️', title: 'Anti-Cheat & Fair Play', desc: 'Advanced protection against bots, hacks, and exploits ensures every player competes on equal footing.' },
+        { icon: '💎', title: 'No Pay-to-Win', desc: 'The in-game shop offers only cosmetics and convenience. Nothing that gives a combat advantage can be bought.' },
+      ],
+      rates_data: [
+        { name: 'XP', val: '×1', note: 'Experience rate' },
+        { name: 'SP', val: '×1', note: 'Skill points rate' },
+        { name: 'Drop', val: '×1', note: 'Item drop rate' },
+        { name: 'Spoil', val: '×1', note: 'Spoil rate' },
+        { name: 'Adena', val: '×1', note: 'Currency drop' },
+        { name: 'Quest', val: '×1', note: 'Quest rewards' },
+      ],
+      dl_data: [
+        { icon: '⚡', title: 'Game Client', desc: 'Full client installer. Recommended for new players. Fast download, single file.', href: 'https://link.dalam.world/DW.exe', btn: 'Download Client' },
+        { icon: '🚀', title: 'Launcher', desc: 'Auto-patching launcher. Keeps your client up to date automatically. Best for long-term play.', href: 'http://proxy-russia-laucher-cloud-vrc-srvs.dalam.world/DW_Laucher', btn: 'Download Launcher' },
+        { icon: '📦', title: 'Google Drive', desc: 'Mirror via Google Drive. Use this if the direct links are slow or unavailable in your region.', href: 'https://drive.usercontent.google.com/download?id=17VX3qB2wAcxrgd2LazMcMvssQBcV22F1', btn: 'Download via Drive' },
+      ],
+    },
+    ru: {
+      hero_eyebrow: 'Lineage 2 · Gracia Final · x1',
+      hero_sub: 'theanion.ru',
+      hero_desc: 'Окунитесь в Lineage 2 такой, какой она должна быть — со ставками x1 на сервере, который чтит оригинальный Gracia Final.',
+      drop: 'Дроп', spoil: 'Спойл', adena: 'Адена',
+      cta_register: '⚔ Зарегистрироваться', cta_dl: '⬇ Скачать клиент',
+      nav_about: 'О сервере', nav_rates: 'Рейты', nav_dl: 'Скачать', nav_comm: 'Сообщество', nav_reg: 'Регистрация',
+      about_label: 'О сервере', about_title: 'Мир, которого не касалось время',
+      about_body: 'TheAnion — приватный сервер Lineage 2 на хронике Gracia Final. Все механики, системы и формулы работают точно так же, как на оригинальных серверах — без донат-преимуществ, без накруток. Чистая классика с оптимизированным клиентом.',
+      stat_all: 'Все рейты', stat_chr: 'Хроника', stat_up: 'Аптайм', stat_p2w: 'Доната-выигрыша',
+      rates_label: 'Рейты сервера', rates_title: 'Оригинальные числа',
+      rates_body: 'Все рейты установлены на ×1 — в точности как на официальных серверах Lineage 2. Никаких бонусов, множителей, и обхода гринда.',
+      dl_label: 'Скачать', dl_title: 'Войди в мир',
+      dl_body: 'Выберите удобный вариант загрузки. Оптимизированный клиент обеспечивает улучшенную производительность при полном сохранении атмосферы Gracia Final.',
+      comm_label: 'Сообщество', comm_title: 'Присоединяйся к братству',
+      comm_body: 'Тысячи игроков, новости сервера, поиск клана и прямая связь с администрацией — в нашем Discord и Telegram.',
+      comm_discord: 'Основная площадка для анонсов, поддержки и общения. Все события, посты ГМ и обновления — здесь.',
+      comm_tg: 'Telegram-канал для быстрых новостей, объявлений о техработах и обновлений сервера.',
+      comm_btn_dc: 'Зайти в Discord', comm_btn_tg: 'Открыть Telegram',
+      wgt_label: 'Онлайн', wgt_title: 'Статус сервера',
+      wgt_zone_lbl: 'Зона виджетов',
+      wgt_zone_p: 'Разместите здесь счётчик онлайна, топ игроков, таймер боссов или любой embed. Блок готов к вставке кода.',
+      reg_label: 'Регистрация', reg_title: 'Твоё путешествие начинается',
+      reg_body: 'Создай аккаунт за несколько секунд и шагни в ворота Адена.',
+      reg_web_h: 'Регистрация на сайте', reg_web_p: 'Создайте аккаунт в личном кабинете, управляйте персонажами и настройками.', reg_web_btn: 'Зарегистрироваться',
+      reg_bot_h: 'Регистрация через Telegram-бота', reg_bot_p: 'Быстрая регистрация прямо в Telegram — без браузера. Откройте бота и следуйте инструкциям.', reg_bot_btn: 'Открыть бота',
+      reg_cp_h: 'Личный кабинет', reg_cp_p: 'Уже зарегистрированы? Войдите в панель управления для управления персонажами и настройками.', reg_cp_btn: 'Войти',
+      footer_login: 'Войти', footer_copy: '© 2025 TheAnion. Все права защищены. Lineage 2 — торговая марка NCSoft.',
+      features: [
+        { icon: '⚙️', title: 'Аутентичные механики', desc: 'Все системы — осады, олимпиада, саб-классы, аугментация — работают как на официальном Gracia Final.' },
+        { icon: '🖥️', title: 'Оптимизированный клиент', desc: 'Клиент основан на оригинале, но переработан под современное железо: больше FPS, меньше вылетов, быстрая загрузка.' },
+        { icon: '🛡️', title: 'Античит и честная игра', desc: 'Продвинутая защита от ботов, читов и эксплойтов — все игроки соревнуются в равных условиях.' },
+        { icon: '💎', title: 'Нет пей-ту-вин', desc: 'В магазине только косметика и удобства. Ничего, дающего боевое преимущество, нельзя купить.' },
+      ],
+      rates_data: [
+        { name: 'XP', val: '×1', note: 'Опыт' },
+        { name: 'SP', val: '×1', note: 'Очки умений' },
+        { name: 'Дроп', val: '×1', note: 'Выпадение предметов' },
+        { name: 'Спойл', val: '×1', note: 'Спойл' },
+        { name: 'Адена', val: '×1', note: 'Валюта' },
+        { name: 'Квесты', val: '×1', note: 'Квестовые награды' },
+      ],
+      dl_data: [
+        { icon: '⚡', title: 'Игровой клиент', desc: 'Полный установщик клиента. Рекомендуется новым игрокам. Быстрая загрузка, один файл.', href: 'https://link.dalam.world/DW.exe', btn: 'Скачать клиент' },
+        { icon: '🚀', title: 'Лаунчер', desc: 'Лаунчер с автообновлением. Автоматически поддерживает клиент в актуальном состоянии.', href: 'http://proxy-russia-laucher-cloud-vrc-srvs.dalam.world/DW_Laucher', btn: 'Скачать лаунчер' },
+        { icon: '📦', title: 'Google Drive', desc: 'Зеркало на Google Drive. Используйте, если прямые ссылки медленные или недоступны в вашем регионе.', href: 'https://drive.usercontent.google.com/download?id=17VX3qB2wAcxrgd2LazMcMvssQBcV22F1', btn: 'Скачать с Drive' },
+      ],
+    },
+    pt: {
+      hero_eyebrow: 'Lineage 2 · Gracia Final · x1',
+      hero_sub: 'theanion.ru',
+      hero_desc: 'Experimente Lineage 2 do jeito que deveria ser — com rates x1, em um servidor que respeita a visão original de Gracia Final.',
+      drop: 'Drop', spoil: 'Spoil', adena: 'Adena',
+      cta_register: '⚔ Registrar agora', cta_dl: '⬇ Baixar Cliente',
+      nav_about: 'Sobre', nav_rates: 'Rates', nav_dl: 'Download', nav_comm: 'Comunidade', nav_reg: 'Registro',
+      about_label: 'Sobre o Servidor', about_title: 'Um Mundo Fora do Tempo',
+      about_body: 'TheAnion é um servidor privado de Lineage 2 na crônica Gracia Final. Todos os sistemas e mecânicas funcionam exatamente como no servidor oficial — sem atalhos, sem pay-to-win. Gameplay clássico puro com cliente otimizado.',
+      stat_all: 'Todos os Rates', stat_chr: 'Crônica', stat_up: 'Uptime', stat_p2w: 'Pay-to-Win',
+      rates_label: 'Rates do Servidor', rates_title: 'Os Números Originais',
+      rates_body: 'Todos os rates são ×1 — exatamente como nos servidores oficiais. Sem bônus, sem multiplicadores.',
+      dl_label: 'Download', dl_title: 'Entre no Mundo',
+      dl_body: 'Escolha a opção que funciona melhor para sua conexão. O cliente otimizado oferece melhor desempenho mantendo a experiência autêntica.',
+      comm_label: 'Comunidade', comm_title: 'Junte-se à Irmandade',
+      comm_body: 'Conecte-se com milhares de jogadores, receba notícias do servidor e fale direto com a equipe.',
+      comm_discord: 'Nosso hub principal para anúncios, suporte e chat da comunidade. Eventos e notas de atualização chegam aqui primeiro.',
+      comm_tg: 'Siga o canal do Telegram para notícias rápidas e atualizações do servidor.',
+      comm_btn_dc: 'Entrar no Discord', comm_btn_tg: 'Abrir Telegram',
+      wgt_label: 'Status ao Vivo', wgt_title: 'Online no Servidor',
+      wgt_zone_lbl: 'Zona de Widgets',
+      wgt_zone_p: 'Coloque aqui seu contador online, widget de top jogadores, timer de boss ou qualquer embed.',
+      reg_label: 'Registro', reg_title: 'Sua Jornada Começa',
+      reg_body: 'Crie sua conta em segundos e passe pelos portões de Aden.',
+      reg_web_h: 'Registro Web', reg_web_p: 'Crie sua conta no painel de controle, gerencie personagens e configurações.', reg_web_btn: 'Registrar no Site',
+      reg_bot_h: 'Registro via Bot do Telegram', reg_bot_p: 'Registro rápido direto pelo Telegram — sem navegador. Abra o bot e siga os passos.', reg_bot_btn: 'Abrir Bot',
+      reg_cp_h: 'Painel Pessoal', reg_cp_p: 'Já registrado? Faça login no painel para gerenciar seus personagens.', reg_cp_btn: 'Entrar',
+      footer_login: 'Entrar', footer_copy: '© 2025 TheAnion. Todos os direitos reservados. Lineage 2 é marca registrada da NCSoft.',
+      features: [
+        { icon: '⚙️', title: 'Mecânicas Autênticas', desc: 'Todos os sistemas — sieges, olimpíada, subclasses, augmentação — funcionam como no Gracia Final oficial.' },
+        { icon: '🖥️', title: 'Cliente Otimizado', desc: 'Baseado no original mas reconstruído para hardware moderno: mais FPS, menos crashes, carregamento rápido.' },
+        { icon: '🛡️', title: 'Anti-Cheat & Jogo Justo', desc: 'Proteção avançada contra bots, hacks e exploits garante competição igual para todos.' },
+        { icon: '💎', title: 'Sem Pay-to-Win', desc: 'A loja vende apenas cosméticos e conveniências. Nada que dê vantagem em combate pode ser comprado.' },
+      ],
+      rates_data: [
+        { name: 'XP', val: '×1', note: 'Taxa de experiência' },
+        { name: 'SP', val: '×1', note: 'Pontos de habilidade' },
+        { name: 'Drop', val: '×1', note: 'Taxa de drop' },
+        { name: 'Spoil', val: '×1', note: 'Taxa de spoil' },
+        { name: 'Adena', val: '×1', note: 'Moeda' },
+        { name: 'Quest', val: '×1', note: 'Recompensas de quest' },
+      ],
+      dl_data: [
+        { icon: '⚡', title: 'Cliente do Jogo', desc: 'Instalador completo. Recomendado para novos jogadores. Download rápido, arquivo único.', href: 'https://link.dalam.world/DW.exe', btn: 'Baixar Cliente' },
+        { icon: '🚀', title: 'Launcher', desc: 'Launcher com atualização automática. Mantém seu cliente sempre atualizado.', href: 'http://proxy-russia-laucher-cloud-vrc-srvs.dalam.world/DW_Laucher', btn: 'Baixar Launcher' },
+        { icon: '📦', title: 'Google Drive', desc: 'Mirror via Google Drive. Use se os links diretos estiverem lentos na sua região.', href: 'https://drive.usercontent.google.com/download?id=17VX3qB2wAcxrgd2LazMcMvssQBcV22F1', btn: 'Baixar pelo Drive' },
+      ],
+    },
+    el: {
+      hero_eyebrow: 'Lineage 2 · Gracia Final · x1',
+      hero_sub: 'theanion.ru',
+      hero_desc: 'Ζήσε το Lineage 2 όπως έπρεπε — με rates x1, σε έναν server που σέβεται το αυθεντικό Gracia Final.',
+      drop: 'Drop', spoil: 'Spoil', adena: 'Adena',
+      cta_register: '⚔ Εγγραφή τώρα', cta_dl: '⬇ Κατέβασε Client',
+      nav_about: 'Σχετικά', nav_rates: 'Rates', nav_dl: 'Λήψη', nav_comm: 'Κοινότητα', nav_reg: 'Εγγραφή',
+      about_label: 'Σχετικά με τον Server', about_title: 'Ένας Κόσμος Αναλλοίωτος',
+      about_body: 'Ο TheAnion είναι private server Lineage 2 στο chronicle Gracia Final. Όλα τα συστήματα λειτουργούν ακριβώς όπως στους επίσημους servers — χωρίς pay-to-win, χωρίς τεχνητές ενισχύσεις. Καθαρό κλασικό gameplay με βελτιστοποιημένο client.',
+      stat_all: 'Όλα τα Rates', stat_chr: 'Chronicle', stat_up: 'Uptime', stat_p2w: 'Pay-to-Win',
+      rates_label: 'Rates Server', rates_title: 'Τα Αυθεντικά Νούμερα',
+      rates_body: 'Όλα τα rates είναι ×1 — ακριβώς όπως στους επίσημους servers. Χωρίς ενισχύσεις, χωρίς πολλαπλασιαστές.',
+      dl_label: 'Λήψη', dl_title: 'Μπες στον Κόσμο',
+      dl_body: 'Διάλεξε την καλύτερη επιλογή για τη σύνδεσή σου. Ο βελτιστοποιημένος client προσφέρει καλύτερη απόδοση διατηρώντας την αυθεντική εμπειρία.',
+      comm_label: 'Κοινότητα', comm_title: 'Γίνε Μέλος της Αδελφότητας',
+      comm_body: 'Συνδέσου με χιλιάδες παίκτες, μάθε νέα και μίλα με τους admins στο Discord και Telegram.',
+      comm_discord: 'Κεντρικό hub για ανακοινώσεις, υποστήριξη και chat. Εδώ φτάνουν πρώτα όλα τα νέα.',
+      comm_tg: 'Ακολούθησε το Telegram για γρήγορα νέα και ενημερώσεις server.',
+      comm_btn_dc: 'Μπες στο Discord', comm_btn_tg: 'Άνοιξε Telegram',
+      wgt_label: 'Live Stats', wgt_title: 'Online Server',
+      wgt_zone_lbl: 'Ζώνη Widget',
+      wgt_zone_p: 'Τοποθέτησε εδώ μετρητή online, top παικτών, timer boss ή οποιοδήποτε embed.',
+      reg_label: 'Εγγραφή', reg_title: 'Το Ταξίδι σου Ξεκινά',
+      reg_body: 'Δημιούργησε λογαριασμό σε δευτερόλεπτα και πέρασε τις πύλες του Aden.',
+      reg_web_h: 'Εγγραφή Web', reg_web_p: 'Δημιούργησε λογαριασμό στο control panel, διαχειρίσου χαρακτήρες και ρυθμίσεις.', reg_web_btn: 'Εγγραφή στο Site',
+      reg_bot_h: 'Εγγραφή μέσω Telegram Bot', reg_bot_p: 'Γρήγορη εγγραφή μέσω Telegram. Άνοιξε το bot και ακολούθησε τα βήματα.', reg_bot_btn: 'Άνοιξε Bot',
+      reg_cp_h: 'Προσωπικό Panel', reg_cp_p: 'Ήδη εγγεγραμμένος; Σύνδεσου για να διαχειριστείς τους χαρακτήρες σου.', reg_cp_btn: 'Σύνδεση',
+      footer_login: 'Σύνδεση', footer_copy: '© 2025 TheAnion. Με επιφύλαξη παντός δικαιώματος. Το Lineage 2 είναι εμπορικό σήμα της NCSoft.',
+      features: [
+        { icon: '⚙️', title: 'Αυθεντικές Μηχανικές', desc: 'Όλα τα συστήματα — πολιορκίες, ολυμπιάδα, subclasses, augmentation — λειτουργούν ακριβώς όπως στο Gracia Final.' },
+        { icon: '🖥️', title: 'Βελτιστοποιημένος Client', desc: 'Βασισμένος στο original αλλά κατασκευασμένος για σύγχρονο hardware: περισσότερα FPS, λιγότερα crashes.' },
+        { icon: '🛡️', title: 'Anti-Cheat & Δίκαιο Παιχνίδι', desc: 'Προηγμένη προστασία από bots, hacks και exploits εξασφαλίζει ίσες συνθήκες.' },
+        { icon: '💎', title: 'Χωρίς Pay-to-Win', desc: 'Το κατάστημα πουλά μόνο καλλυντικά. Τίποτα που δίνει μαχητικό πλεονέκτημα δεν μπορεί να αγοραστεί.' },
+      ],
+      rates_data: [
+        { name: 'XP', val: '×1', note: 'Εμπειρία' },
+        { name: 'SP', val: '×1', note: 'Πόντοι δεξιοτήτων' },
+        { name: 'Drop', val: '×1', note: 'Ποσοστό drop' },
+        { name: 'Spoil', val: '×1', note: 'Ποσοστό spoil' },
+        { name: 'Adena', val: '×1', note: 'Νόμισμα' },
+        { name: 'Quest', val: '×1', note: 'Ανταμοιβές quest' },
+      ],
+      dl_data: [
+        { icon: '⚡', title: 'Game Client', desc: 'Πλήρης εγκαταστάτης. Συνιστάται για νέους παίκτες. Γρήγορη λήψη, ένα αρχείο.', href: 'https://link.dalam.world/DW.exe', btn: 'Λήψη Client' },
+        { icon: '🚀', title: 'Launcher', desc: 'Launcher με αυτόματη ενημέρωση. Κρατά τον client σου ενημερωμένο αυτόματα.', href: 'http://proxy-russia-laucher-cloud-vrc-srvs.dalam.world/DW_Laucher', btn: 'Λήψη Launcher' },
+        { icon: '📦', title: 'Google Drive', desc: 'Mirror μέσω Google Drive. Χρησιμοποίησε αν οι άμεσοι σύνδεσμοι είναι αργοί.', href: 'https://drive.usercontent.google.com/download?id=17VX3qB2wAcxrgd2LazMcMvssQBcV22F1', btn: 'Λήψη από Drive' },
+      ],
+    },
+    uk: {
+      hero_eyebrow: 'Lineage 2 · Gracia Final · x1',
+      hero_sub: 'theanion.ru',
+      hero_desc: 'Відчуй Lineage 2 такою, якою вона має бути — з рейтами x1 на сервері, що шанує оригінальний Gracia Final.',
+      drop: 'Дроп', spoil: 'Спойл', adena: 'Адена',
+      cta_register: '⚔ Зареєструватися', cta_dl: '⬇ Скачати клієнт',
+      nav_about: 'Про сервер', nav_rates: 'Рейти', nav_dl: 'Завантажити', nav_comm: 'Спільнота', nav_reg: 'Реєстрація',
+      about_label: 'Про сервер', about_title: 'Світ, незайманий часом',
+      about_body: 'TheAnion — приватний сервер Lineage 2 на хроніці Gracia Final. Усі механіки та системи працюють точно так само, як на офіційних серверах — без донат-переваг, без накруток. Чиста класика з оптимізованим клієнтом.',
+      stat_all: 'Усі рейти', stat_chr: 'Хроніка', stat_up: 'Аптайм', stat_p2w: 'Доната-перемоги',
+      rates_label: 'Рейти сервера', rates_title: 'Оригінальні числа',
+      rates_body: 'Усі рейти встановлено на ×1 — так само як на офіційних серверах Lineage 2. Жодних бонусів, множників і обходу гринду.',
+      dl_label: 'Завантажити', dl_title: 'Увійди у світ',
+      dl_body: 'Обери зручний варіант завантаження. Оптимізований клієнт забезпечує кращу продуктивність зі збереженням автентичної атмосфери Gracia Final.',
+      comm_label: 'Спільнота', comm_title: 'Приєднуйся до братства',
+      comm_body: 'Тисячі гравців, новини сервера, пошук клану та пряме спілкування з адміністрацією — у Discord і Telegram.',
+      comm_discord: 'Головний майданчик для оголошень, підтримки та спілкування. Усі події та оновлення — тут першими.',
+      comm_tg: 'Telegram-канал для швидких новин, сповіщень про технічні роботи та оновлень сервера.',
+      comm_btn_dc: 'Зайти в Discord', comm_btn_tg: 'Відкрити Telegram',
+      wgt_label: 'Онлайн', wgt_title: 'Статус сервера',
+      wgt_zone_lbl: 'Зона віджетів',
+      wgt_zone_p: 'Розмістіть тут лічильник онлайну, топ гравців, таймер босів або будь-який embed. Блок готовий до вставки коду.',
+      reg_label: 'Реєстрація', reg_title: 'Твоя подорож починається',
+      reg_body: 'Створи акаунт за кілька секунд і крокуй крізь ворота Адена.',
+      reg_web_h: 'Реєстрація на сайті', reg_web_p: 'Створіть акаунт в особистому кабінеті, керуйте персонажами і налаштуваннями.', reg_web_btn: 'Зареєструватися',
+      reg_bot_h: 'Реєстрація через Telegram-бота', reg_bot_p: 'Швидка реєстрація прямо у Telegram — без браузера. Відкрийте бота та слідуйте інструкціям.', reg_bot_btn: 'Відкрити бота',
+      reg_cp_h: 'Особистий кабінет', reg_cp_p: 'Вже зареєстровані? Увійдіть до панелі управління для керування персонажами.', reg_cp_btn: 'Увійти',
+      footer_login: 'Увійти', footer_copy: '© 2025 TheAnion. Усі права захищено. Lineage 2 — торгова марка NCSoft.',
+      features: [
+        { icon: '⚙️', title: 'Автентичні механіки', desc: 'Усі системи — облоги, олімпіада, саб-класи, аугментація — працюють як на офіційному Gracia Final.' },
+        { icon: '🖥️', title: 'Оптимізований клієнт', desc: 'Клієнт побудований на оригіналі, але переосмислений для сучасного заліза: більше FPS, менше вильотів.' },
+        { icon: '🛡️', title: 'Античит і чесна гра', desc: 'Передовий захист від ботів, читів та експлойтів гарантує рівні умови для всіх.' },
+        { icon: '💎', title: 'Немає pay-to-win', desc: 'У магазині лише косметика та зручності. Нічого, що дає бойову перевагу, купити не можна.' },
+      ],
+      rates_data: [
+        { name: 'XP', val: '×1', note: 'Досвід' },
+        { name: 'SP', val: '×1', note: 'Очки вмінь' },
+        { name: 'Дроп', val: '×1', note: 'Випадіння предметів' },
+        { name: 'Спойл', val: '×1', note: 'Спойл' },
+        { name: 'Адена', val: '×1', note: 'Валюта' },
+        { name: 'Квести', val: '×1', note: 'Квестові нагороди' },
+      ],
+      dl_data: [
+        { icon: '⚡', title: 'Ігровий клієнт', desc: 'Повний установник клієнта. Рекомендується новим гравцям. Швидке завантаження, один файл.', href: 'https://link.dalam.world/DW.exe', btn: 'Скачати клієнт' },
+        { icon: '🚀', title: 'Лаунчер', desc: 'Лаунчер з автооновленням. Автоматично підтримує клієнт в актуальному стані.', href: 'http://proxy-russia-laucher-cloud-vrc-srvs.dalam.world/DW_Laucher', btn: 'Скачати лаунчер' },
+        { icon: '📦', title: 'Google Drive', desc: 'Дзеркало на Google Drive. Використовуйте, якщо прямі посилання повільні у вашому регіоні.', href: 'https://drive.usercontent.google.com/download?id=17VX3qB2wAcxrgd2LazMcMvssQBcV22F1', btn: 'Скачати з Drive' },
+      ],
+    },
+  };
+
+  // ── CURRENT LANG ──────────────────────────────────────────────────────────
+  let currentLang = 'en';
+
+  function setLang(lang) {
+    currentLang = lang;
+    const t = T[lang];
+
+    // Update simple [data-key] elements
+    document.querySelectorAll('[data-key]').forEach(el => {
+      const k = el.getAttribute('data-key');
+      if (t[k] !== undefined) el.textContent = t[k];
+    });
+
+    // Nav links using data-navkey
+    document.querySelectorAll('[data-navkey]').forEach(el => {
+      const k = el.getAttribute('data-navkey');
+      if (t[k] !== undefined) el.textContent = t[k];
+    });
+
+    // Rebuild dynamic sections
+    buildFeatures(t);
+    buildRates(t);
+    buildDownloads(t);
+
+    // Toggle active lang button
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.textContent.toLowerCase() === lang || (lang === 'pt' && btn.textContent === 'PT') || (lang === 'el' && btn.textContent === 'GR') || (lang === 'uk' && btn.textContent === 'UA'));
+    });
+  }
+
+  // ── FEATURE LIST ──────────────────────────────────────────────────────────
+  function buildFeatures(t) {
+    const el = document.getElementById('features-list');
+    if (!el || !t.features) return;
+    el.innerHTML = t.features.map(f => `
+      <div class="feature-item">
+        <div class="feature-icon">${f.icon}</div>
+        <div class="feature-text"><h4>${f.title}</h4><p>${f.desc}</p></div>
+      </div>`).join('');
+  }
+
+  // ── RATES GRID ────────────────────────────────────────────────────────────
+  function buildRates(t) {
+    const el = document.getElementById('rates-grid');
+    if (!el || !t.rates_data) return;
+    el.innerHTML = t.rates_data.map(r => `
+      <div class="rate-card">
+        <div class="rate-name">${r.name}</div>
+        <div class="rate-val">${r.val}</div>
+        <div class="rate-note">${r.note}</div>
+      </div>`).join('');
+  }
+
+  // ── DOWNLOADS ─────────────────────────────────────────────────────────────
+  function buildDownloads(t) {
+    const el = document.getElementById('dl-grid');
+    if (!el || !t.dl_data) return;
+    el.innerHTML = t.dl_data.map(d => `
+      <div class="dl-card">
+        <div class="dl-icon">${d.icon}</div>
+        <h3>${d.title}</h3>
+        <p>${d.desc}</p>
+        <a href="${d.href}" class="btn btn-primary" target="_blank">${d.btn}</a>
+      </div>`).join('');
+  }
+
+  // ── EMBER PARTICLES ───────────────────────────────────────────────────────
+  function spawnEmbers() {
+    const container = document.getElementById('embers');
+    if (!container) return;
+    for (let i = 0; i < 28; i++) {
+      const e = document.createElement('div');
+      e.className = 'ember';
+      const left = Math.random() * 100;
+      const dur  = 5 + Math.random() * 8;
+      const delay = Math.random() * 10;
+      const dx   = (Math.random() - .5) * 100;
+      const size = 2 + Math.random() * 3;
+      e.style.cssText = `
+        left:${left}%; width:${size}px; height:${size}px;
+        animation-duration:${dur}s; animation-delay:${delay}s;
+        --dx:${dx}px;
+        background: ${Math.random() > .5 ? '#C9A84C' : '#C0352E'};
+      `;
+      container.appendChild(e);
+    }
+  }
+
+  // ── INIT ──────────────────────────────────────────────────────────────────
+  window.addEventListener('DOMContentLoaded', () => {
+    setLang('en');
+    spawnEmbers();
+  });
+  </script>
+</body>
+</html>
